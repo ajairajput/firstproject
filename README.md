@@ -15,6 +15,8 @@ Then open http://127.0.0.1:5000 in a browser.
 
 Data is saved to a local SQLite file (`renovation.db`, gitignored) next to `app.py` — survives clearing browser data, but stays on this machine.
 
+For a fuller step-by-step walkthrough (including troubleshooting), see [docs/RUNNING.md](docs/RUNNING.md).
+
 ## What it does
 
 - Pre-populated checklist of repairs/renovations across 7 categories (Structural & Systems, Exterior, Kitchen, Bathroom, Flooring, Energy Efficiency, Staging & Cosmetic), each tagged **Must-Fix**, **High-ROI**, or **Nice-to-Have** based on resale-value research.
