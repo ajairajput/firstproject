@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card hero">
+  <div>
+    <div class="figure">{{ overall_pct }}<sup>%</sup></div>
+    <div class="sub">of pre-listing tasks complete</div>
+  </div>
+  <div class="meter-wrap">
+    <div class="meter-track"><div class="meter-fill" style="width:{{ overall_pct }}%"></div></div>
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="card"><div class="label">Total tasks</div><div class="value">{{ kpi.total }}</div></div>
+  <div class="card"><div class="label">Not started</div><div class="value">{{ kpi.not_started }}</div></div>
+  <div class="card"><div class="label">In progress</div><div class="value">{{ kpi.in_progress }}</div></div>
+  <div class="card"><div class="label">Done</div><div class="value">{{ kpi.done }}</div></div>
+  <div class="card"><div class="label">Est. remaining cost</div><div class="value">${{ "{:,}".format(kpi.remaining_cost) }}</div></div>
+</div>
+
+<section class="section">
+  <h2>Progress by category</h2>
+  <div class="card" style="padding:16px 20px;">
+    <div class="cat-list">
+      {% for cat in category_progress %}
+      <div class="cat-row">
+        <div class="name">{{ cat.name }}</div>
+        <div class="meter-track"><div class="meter-fill" style="width:{{ cat.pct }}%"></div></div>
+        <div class="pct">{{ cat.pct }}%</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Checklist</h2>
+
+  <form class="controls" method="get" action="{{ url_for('index') }}">
+    <select name="category">
+      <option value="">All categories</option>
+      {% for c in categories %}<option value="{{ c }}"{% if filters.category == c %} selected{% endif %}>{{ c }}</option>{% endfor %}
+    </select>
+    <select name="priority">
+      <option value="">All priorities</option>
+      {% for p in priorities %}<option value="{{ p }}"{% if filters.priority == p %} selected{% endif %}>{{ p }}</option>{% endfor %}
+    </select>
+    <select name="status">
+      <option value="">All statuses</option>
+      {% for s in statuses %}<option value="{{ s }}"{% if filters.status == s %} selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+    <input type="search" name="search" placeholder="Search tasks..." value="{{ filters.search }}">
+    <button type="submit">Apply filters</button>
+    {% if filters.category or filters.priority or filters.status or filters.search %}
+      <a class="clear-link" href="{{ url_for('index') }}">Clear</a>
+    {% endif %}
+  </form>
+
+  <details class="card add-task-card">
+    <summary>+ Add task</summary>
+    <form method="post" action="{{ url_for('add_task') }}" class="add-form">
+      <input name="title" placeholder="Task title" required>
+      <select name="category" required>
+        {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+      </select>
+      <select name="priority" required>
+        {% for p in priorities %}<option value="{{ p }}">{{ p }}</option>{% endfor %}
+      </select>
+      <input name="cost" type="number" min="0" step="1" placeholder="Est. cost ($)">
+      <input name="notes" placeholder="Notes (optional)">
+      <button type="submit">Add task</button>
+    </form>
+  </details>
+
+  <div class="card" style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th><th>Category</th><th>Priority</th><th>Status</th><th>Est. cost</th><th>Notes</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tasks %}
+        <tr>
+          <td>{{ t['title'] }}</td>
+          <td>
+            <select name="category" form="update-{{ t['id'] }}" class="cat-select">
+              {% for c in categories %}<option value="{{ c }}"{% if c == t['category'] %} selected{% endif %}>{{ c }}</option>{% endfor %}
+            </select>
+          </td>
+          <td>
+            <select name="priority" form="update-{{ t['id'] }}" class="badge-select {{ priority_meta[t['priority']]['class'] }}">
+              {% for p in priorities %}<option value="{{ p }}"{% if p == t['priority'] %} selected{% endif %}>{{ priority_meta[p]['icon'] }} {{ p }}</option>{% endfor %}
+            </select>
+          </td>
+          <td>
+            <select name="status" form="update-{{ t['id'] }}" class="badge-select {{ status_meta[t['status']]['class'] }}">
+              {% for s in statuses %}<option value="{{ s }}"{% if s == t['status'] %} selected{% endif %}>{{ status_meta[s]['icon'] }} {{ s }}</option>{% endfor %}
+            </select>
+          </td>
+          <td class="cost">${{ "{:,}".format(t['cost']) }}</td>
+          <td class="notes">{{ t['notes'] }}</td>
+          <td class="row-actions">
+            <button type="submit" form="update-{{ t['id'] }}" class="save-btn" title="Save">Save</button>
+            <button type="submit" form="delete-{{ t['id'] }}" class="delete-btn" title="Delete">&#10005;</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% for t in tasks %}
+  <form id="update-{{ t['id'] }}" method="post" action="{{ url_for('update_task', task_id=t['id']) }}"></form>
+  <form id="delete-{{ t['id'] }}" method="post" action="{{ url_for('delete_task', task_id=t['id']) }}"></form>
+  {% endfor %}
+</section>
+
+{% endblock %}

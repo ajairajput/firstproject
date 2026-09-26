@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"{% if theme %} data-theme="{{ theme }}"{% endif %}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Home Renovation Tracker{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="wrap">
+  <header class="app-header">
+    <div>
+      <h1>Home Renovation Tracker</h1>
+      <p>Prepping the house for market &mdash; Quincy, MA</p>
+    </div>
+    <a class="theme-link" href="{{ url_for('set_theme', mode='dark' if theme != 'dark' else 'light') }}">
+      {{ 'Light theme' if theme == 'dark' else 'Dark theme' }}
+    </a>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="app-footer">
+    Data is saved locally in a SQLite file (<code>renovation.db</code>) next to this app.
+    See <a href="https://github.com/ajairajput/firstproject/blob/main/docs/QUINCY_SELLING_GUIDE.md">docs/QUINCY_SELLING_GUIDE.md</a> for the full market &amp; staging guide.
+  </footer>
+</div>
+</body>
+</html>

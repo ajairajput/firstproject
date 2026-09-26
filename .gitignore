@@ -17,6 +17,10 @@ ENV/
 # Environment variables
 .env
 
+# App data
+*.db
+*.sqlite3
+
 # Testing
 .pytest_cache/
 .coverage
